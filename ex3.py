@@ -1,9 +1,15 @@
 import sys
 from WordSet import WordSet
-from collections import Counter
+from BigramWordSet import BigramWordSet
+
 
 def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, secondInputWord, outputFilename):
-    print "Program Started"
+    print "Started with: "
+    print "\tDevelopment set filename: %s" % developmentSetFilename
+    print "\tTest set filename: %s" % testSetFilename
+    print "\tInput word: %s" % firstInputWord
+    print "\tInput word2: %s" % secondInputWord
+    print "\tOutput filename: %s" % outputFilename
     vocabularySize = 300000
 
     file = open(outputFilename, "w+")
@@ -26,6 +32,9 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     file.write("Output8: " + str(trainingWordSet.length) + "\n")
     file.write("Output9: " + str(trainingWordSet.distinctLength) + "\n")
     file.write("Output10: " + str(trainingWordSet.countAppearances(firstInputWord)) + "\n")
+
+    bigramWordSet = BigramWordSet(trainingSet, vocabularySize, "begin-arcticle")
+    file.write("Output11: " + str(bigramWordSet.countAppearances(firstInputWord, secondInputWord)))
     # output11
 
 
@@ -47,10 +56,10 @@ def parse_file_data(file_data):
 
 
 def main():
-    #if len(sys.argv) != 4:
-     #   print "How to use: " + sys.argv[
-       #     0] + " < development_set_filename > < test_set_filename > < INPUT WORD > < output_filename >"
-      #  sys.exit(1)
+    # if len(sys.argv) != 4:
+    #   print "How to use: " + sys.argv[
+    #     0] + " < development_set_filename > < test_set_filename > < INPUT WORD > < output_filename >"
+    #  sys.exit(1)
 
     development_file_path = sys.argv[1]
     test_file_path = sys.argv[2]
@@ -58,7 +67,8 @@ def main():
     second_input_word = sys.argv[4]
     output_file_path = sys.argv[5]
 
-    generateOutputFile(development_file_path,test_file_path,first_input_word,second_input_word,output_file_path)
+    generateOutputFile(development_file_path, test_file_path, first_input_word, second_input_word, output_file_path)
+
 
 if __name__ == '__main__':
     main()

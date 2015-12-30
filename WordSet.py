@@ -1,5 +1,5 @@
 from collections import Counter
-class WordSet:
+class WordSet(object):
     '''
     Describes a stream of words (as our events), allowing needed methods on them.
     '''
