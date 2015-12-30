@@ -1,6 +1,7 @@
 import sys
 from WordSet import WordSet
 from BigramWordSet import BigramWordSet
+from BackOffModel import BackOffModel
 
 
 def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, secondInputWord, outputFilename):
@@ -36,6 +37,9 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     bigramWordSet = BigramWordSet(trainingSet, vocabularySize, "begin-arcticle")
     file.write("Output11: " + str(bigramWordSet.countAppearances(firstInputWord, secondInputWord)))
     # output11
+
+    model = BackOffModel(bigramWordSet,trainingWordSet)
+    print model.pBackOff(firstInputWord, secondInputWord,0.1)
 
 
 def parse_file_data(file_data):
