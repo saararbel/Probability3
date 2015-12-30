@@ -38,8 +38,8 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     file.write("Output11: " + str(bigramWordSet.countAppearances(firstInputWord, secondInputWord)))
     # output11
 
-    model = BackOffModel(bigramWordSet,trainingWordSet)
-    print model.pBackOff(firstInputWord, secondInputWord,0.1)
+    model = BackOffModel(bigramWordSet,trainingWordSet, 0.1)
+    print model.debug()
 
 
 def parse_file_data(file_data):
