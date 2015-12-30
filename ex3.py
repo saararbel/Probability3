@@ -1,4 +1,7 @@
 import sys
+
+import math
+
 from WordSet import WordSet
 from BigramWordSet import BigramWordSet
 from BackOffModel import BackOffModel
@@ -34,13 +37,54 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     file.write("Output9: " + str(trainingWordSet.distinctLength) + "\n")
     file.write("Output10: " + str(trainingWordSet.countAppearances(firstInputWord)) + "\n")
 
-    bigramWordSet = BigramWordSet(trainingSet, vocabularySize, "begin-arcticle")
-    file.write("Output11: " + str(bigramWordSet.countAppearances(firstInputWord, secondInputWord)))
-    # output11
+    trainingBigramWordSet = BigramWordSet(trainingSet, vocabularySize, 'begin-article')
+    file.write("Output11: " + str(trainingBigramWordSet.countAppearances(firstInputWord, secondInputWord)))
 
-    model = BackOffModel(bigramWordSet,trainingWordSet)
-    print model.pBackOff(firstInputWord, secondInputWord,0.1)
+    validationBigramWordSet = BigramWordSet(validationSet, vocabularySize, 'begin-article')
+    backOffTrainingModel = BackOffModel(trainingBigramWordSet,trainingWordSet)
+    backOffValidationModel = BackOffModel(validationBigramWordSet, validationWordSet)
+    # file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)))
+    print backOffTrainingModel.debug()
 
+    print backOffTrainingModel.pBackOff(firstInputWord, secondInputWord,0.1)
+
+def frange(x, y, jump):
+    while x < y:
+        yield x
+        x += jump
+
+def minimumPerplexity(trainingWordSet, validationWordSet):
+    '''
+    Calculating the perplexity of each of the lambdas in (0, 2] with jumps of 0.01. Then return the minimum perplexity
+     from between the perplexity caculated and its matching lambda.
+    :param trainingWordSet: Instance of {WordSet}.
+    :param validationWordSet: Instance of {WordSet}.
+    :return: min-perplexity, min-lambda
+    '''
+    lamdagen = frange(0.0001, 0.02, 0.0001)
+    minlamda = lamdagen.next()
+    minperplexity = backOffPerplexity(trainingWordSet, validationWordSet, minlamda)
+    for lamda in lamdagen:
+        currperplexity = backOffPerplexity(trainingWordSet, validationWordSet, lamda)
+        if currperplexity < minperplexity:
+            minperplexity = currperplexity
+            minlamda = lamda
+
+    return minperplexity, minlamda
+
+def backOffPerplexity(trainingBackOffWordSet, validationBackOffWordSet, lamda):
+    '''
+    Iterate each distinct word in {testSet} and sum his Lidstone discount's propability with the given {lamda lambda}
+     multiplied by the times it appeared.
+    :param trainingBackOffWordSet: Instance of {WordSet}.
+    :param validationBackOffWordSet: Instance of {WordSet}.
+    :param lamda: A rational positive number.
+    :return:
+    '''
+    logs = [math.log(trainingBackOffWordSet.pBackOff(word, lamda)) * appearances for word, appearances in
+            validationBackOffWordSet.bigramWordSet.distinctItems() if True]
+
+    return math.pow(math.e, -1 * sum(logs) / validationBackOffWordSet.bigramWordSet.length)
 
 def parse_file_data(file_data):
     '''
