@@ -37,10 +37,10 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     file.write("Output9: " + str(trainingWordSet.distinctLength) + "\n")
     file.write("Output10: " + str(trainingWordSet.countAppearances(firstInputWord)) + "\n")
 
-    trainingBigramWordSet = BigramWordSet(trainingSet, vocabularySize, 'begin-article')
+    trainingBigramWordSet = BigramWordSet(trainingSet, vocabularySize, trainingWordSet)
     file.write("Output11: " + str(trainingBigramWordSet.countAppearances(firstInputWord, secondInputWord)) + "\n")
 
-    validationBigramWordSet = BigramWordSet(validationSet, vocabularySize, 'begin-article')
+    validationBigramWordSet = BigramWordSet(validationSet, vocabularySize, validationWordSet)
     backOffTrainingModel = BackOffModel(trainingBigramWordSet,trainingWordSet)
     backOffValidationModel = BackOffModel(validationBigramWordSet, validationWordSet)
 
