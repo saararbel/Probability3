@@ -38,15 +38,18 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     file.write("Output10: " + str(trainingWordSet.countAppearances(firstInputWord)) + "\n")
 
     trainingBigramWordSet = BigramWordSet(trainingSet, vocabularySize, 'begin-article')
-    file.write("Output11: " + str(trainingBigramWordSet.countAppearances(firstInputWord, secondInputWord)))
+    file.write("Output11: " + str(trainingBigramWordSet.countAppearances(firstInputWord, secondInputWord)) + "\n")
 
     validationBigramWordSet = BigramWordSet(validationSet, vocabularySize, 'begin-article')
     backOffTrainingModel = BackOffModel(trainingBigramWordSet,trainingWordSet)
     backOffValidationModel = BackOffModel(validationBigramWordSet, validationWordSet)
-    # file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)))
+
+    # print backOffTrainingModel.pBackOff(firstInputWord, secondInputWord,0.001)
+    print str(backOffTrainingModel.bigramWordSet.pLidstone(("bank", "economist"), 0.001)) + " boaz"
+    # print backOffTrainingModel.pBackOff("bank", "economist",0.1)
     print backOffTrainingModel.debug()
 
-    print backOffTrainingModel.pBackOff(firstInputWord, secondInputWord,0.1)
+    file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)) + "\n")
 
 def frange(x, y, jump):
     while x < y:
@@ -81,10 +84,11 @@ def backOffPerplexity(trainingBackOffWordSet, validationBackOffWordSet, lamda):
     :param lamda: A rational positive number.
     :return:
     '''
-    logs = [math.log(trainingBackOffWordSet.pBackOff(word, lamda)) * appearances for word, appearances in
+    logs = [math.log(trainingBackOffWordSet.pBackOff(firstWord, secondWord, lamda)) * appearances for (firstWord, secondWord), appearances in
             validationBackOffWordSet.bigramWordSet.distinctItems() if True]
+    logs.append(math.log(trainingBackOffWordSet.pBackOff("begin-article", validationBackOffWordSet.unigramWordSet.start[0], lamda)))
 
-    return math.pow(math.e, -1 * sum(logs) / validationBackOffWordSet.bigramWordSet.length)
+    return math.pow(math.e, -1 * sum(logs) / validationBackOffWordSet.unigramWordSet.length)
 
 def parse_file_data(file_data):
     '''
