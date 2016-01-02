@@ -9,10 +9,12 @@ class WordSet(object):
         :param vocabularySize: a natural number setting the threshold of our vocabulary size.
         :return: a {WordSet} item
         '''
+        self.words = words
         self.wordAppearanceCounter = Counter(words)
         self.length = len(words)
         self.distinctLength = len(self.wordAppearanceCounter.keys())
         self.vocabularySize = vocabularySize
+
 
     def distinctItems(self):
         '''

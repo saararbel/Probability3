@@ -22,7 +22,7 @@ class BackOffModel:
             for tempWord, amount in self.unigramWordSet.distinctItems():
                 if(self.bigramWordSet.countAppearances(word, tempWord) > 0):
                     mona -= self.bigramWordSet.pLidstone((word, tempWord), bigramLamda)
-                    mechana -= self.unigramWordSet.pLidstone((tempWord) , 0.1)
+                    mechana -= self.unigramWordSet.pLidstone(tempWord , 0.1)
             self.alphaDict[key] = mona/mechana
         return self.alphaDict[key]
 

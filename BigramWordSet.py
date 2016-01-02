@@ -7,3 +7,10 @@ class BigramWordSet(WordSet):
 
     def countAppearances(self, first, second):
         return self.wordAppearanceCounter[(first, second)]
+
+    def pLidstone(self,word,lamda, unigramWordSet):
+        len = unigramWordSet.wordAppearanceCounter["bank"]
+        print len
+        print word
+        print self.wordAppearanceCounter[word]
+        return (self.wordAppearanceCounter[word] + lamda) / (len + self.vocabularySize * lamda)

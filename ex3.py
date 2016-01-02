@@ -38,15 +38,45 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     file.write("Output10: " + str(trainingWordSet.countAppearances(firstInputWord)) + "\n")
 
     trainingBigramWordSet = BigramWordSet(trainingSet, vocabularySize, 'begin-article')
-    file.write("Output11: " + str(trainingBigramWordSet.countAppearances(firstInputWord, secondInputWord)))
+    file.write("Output11: " + str(trainingBigramWordSet.countAppearances(firstInputWord, secondInputWord)) + "\n")
 
     validationBigramWordSet = BigramWordSet(validationSet, vocabularySize, 'begin-article')
+
     backOffTrainingModel = BackOffModel(trainingBigramWordSet,trainingWordSet)
     backOffValidationModel = BackOffModel(validationBigramWordSet, validationWordSet)
     # file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)))
-    print backOffTrainingModel.debug()
+    # print backOffTrainingModel.debug()
+    # print backOffTrainingModel.pBackOff(firstInputWord, secondInputWord,0.1)
 
-    print backOffTrainingModel.pBackOff(firstInputWord, secondInputWord,0.1)
+    # file.write("Output18: " + str(printTable(backOffTrainingModel,0.001,firstInputWord)) + "\n")
+    word = "economist"
+    # print backOffTrainingModel.bigramWordSet.countAppearances(firstInputWord,word)
+    # print backOffTrainingModel.bigramWordSet.pLidstone((firstInputWord,word),0.001)
+    # print backOffTrainingModel.bigramWordSet.wordAppearanceCounter([(firstInputWord,word)])
+    # print str("saar12= ") + str(trainingWordSet.wordAppearanceCounter["economist"])
+    #
+    # print str("counter = ") + str(backOffTrainingModel.bigramWordSet.wordAppearanceCounter["bank","economist"])
+    # print str("length = ") + str(backOffTrainingModel.bigramWordSet.length)
+
+    print str("bulbul = ") + str(backOffTrainingModel.bigramWordSet.pLidstone(("bank,economist"),0.001, trainingWordSet))
+    # print trainingWordSet.wordAppearanceCounter["bank"]
+    # file.write(str(backOffTrainingModel.pBackOff("the" , 0.1)))
+
+
+def printTable(trainingBackOffWordSet, lamda , firstWord):
+    outputLine = '\n'
+    for index,word in enumerate(set(trainingBackOffWordSet.unigramWordSet.wordAppearanceCounter)):
+        outputLine += str(index) + '\t' + word + '\t'
+        outputLine += str(trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,word)) + '\t'
+        outputLine += str(trainingBackOffWordSet.pBackOff(firstWord,word,lamda)) + '\n'
+    # unseen-words
+    unseen = "unseen-word"
+    outputLine += str(trainingBackOffWordSet.unigramWordSet.vocabularySize - trainingBackOffWordSet.unigramWordSet.distinctLength) + '\t'
+    outputLine += unseen + '\t'
+    outputLine += str(trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,unseen)) + '\t'
+    outputLine += str(trainingBackOffWordSet.pBackOff(firstWord,unseen,lamda)) + '\n'
+
+    return outputLine
 
 def frange(x, y, jump):
     while x < y:
@@ -72,19 +102,26 @@ def minimumPerplexity(trainingWordSet, validationWordSet):
 
     return minperplexity, minlamda
 
-def backOffPerplexity(trainingBackOffWordSet, validationBackOffWordSet, lamda):
+def backOffPerplexity(trainingBackOffModel, validationBackOffWordSet, lamda):
     '''
     Iterate each distinct word in {testSet} and sum his Lidstone discount's propability with the given {lamda lambda}
      multiplied by the times it appeared.
-    :param trainingBackOffWordSet: Instance of {WordSet}.
+    :param trainingBackOffModel: Instance of {WordSet}.
     :param validationBackOffWordSet: Instance of {WordSet}.
     :param lamda: A rational positive number.
     :return:
     '''
-    logs = [math.log(trainingBackOffWordSet.pBackOff(word, lamda)) * appearances for word, appearances in
-            validationBackOffWordSet.bigramWordSet.distinctItems() if True]
+    ext = 0
+    for event in validationBackOffWordSet.bigramWordSet.words:
+        p = trainingBackOffModel.pBackOff(event,lamda)
+        ext += math.log(p)
+    ext = -1 * (ext / float(len(validationBackOffWordSet.bigramWordSet.words)))
 
-    return math.pow(math.e, -1 * sum(logs) / validationBackOffWordSet.bigramWordSet.length)
+    return math.pow(math.e,ext)
+    # logs = [math.log(trainingBackOffWordSet.pBackOff(word, lamda)) * appearances for word, appearances in
+    #         validationBackOffWordSet.bigramWordSet.distinctItems() if True]
+    #
+    # return math.pow(math.e, -1 * sum(logs) / validationBackOffWordSet.bigramWordSet.length)
 
 def parse_file_data(file_data):
     '''
