@@ -76,16 +76,13 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
 
 def printTable(trainingBackOffWordSet, lamda , firstWord):
     outputLine = '\n'
-    for index,word in enumerate(set(trainingBackOffWordSet.unigramWordSet.wordAppearanceCounter)):
-        outputLine += str(index) + '\t' + word + '\t'
-        outputLine += str(trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,word)) + '\t'
-        outputLine += str(trainingBackOffWordSet.pBackOff(firstWord,word,lamda)) + '\n'
-    # unseen-words
+    combinations = []
     unseen = "UNSEEN_EVENT"
-    outputLine += str(trainingBackOffWordSet.unigramWordSet.vocabularySize - trainingBackOffWordSet.unigramWordSet.distinctLength) + '\t'
-    outputLine += unseen + '\t'
-    outputLine += str(trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,unseen)) + '\t'
-    outputLine += str(trainingBackOffWordSet.pBackOff(firstWord,unseen,lamda)) + '\n'
+    for index,word in enumerate(set(trainingBackOffWordSet.unigramWordSet.wordAppearanceCounter)):
+        combinations.append((index, word, trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,word), trainingBackOffWordSet.pBackOff(firstWord,word,lamda)))
+    combinations.append((trainingBackOffWordSet.unigramWordSet.vocabularySize - trainingBackOffWordSet.unigramWordSet.distinctLength, unseen, trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,unseen), trainingBackOffWordSet.pBackOff(firstWord,unseen,lamda)))
+    for index, word, appearences, propability in sorted(combinations, key = lambda x: x[3], reverse = True):
+        outputLine += str(index) + "\t" + str(word) + "\t" + str(appearences) + "\t" + str(propability) + "\n"
 
     return outputLine
 
