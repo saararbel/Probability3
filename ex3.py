@@ -56,11 +56,23 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     print "finished 13"
     file.write('Output14: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.1)) + "\n")
     print "finished 14"
-    minperplexity, minlamda = minimumPerplexity(backOffTrainingModel, backOffValidationModel)
-    file.write('Output15: ' + str(minlamda) + "\n")
-    print "finished 15"
-    file.write('Output16: ' + str(minperplexity) + "\n")
-    print "finished 16"
+    # minperplexity, minlamda = minimumPerplexity(backOffTrainingModel, backOffValidationModel)
+    # file.write('Output15: ' + str(minlamda) + "\n")
+    # print "finished 15"
+    # file.write('Output16: ' + str(minperplexity) + "\n")
+    # print "finished 16"
+
+    with open(testSetFilename, 'rb') as input_file2:
+        input_file_data2 = input_file2.read()
+    words2 = parse_file_data(input_file_data2)
+    trainingWordSet2 = WordSet(words2,vocabularySize)
+    trainingBigramWordSet2 = BigramWordSet(words2, vocabularySize, trainingWordSet2)
+    backOffTrainingModel2 = BackOffModel(trainingBigramWordSet2,trainingWordSet2)
+
+    file.write('Output17: ' + str(backOffPerplexity(backOffTrainingModel, backOffTrainingModel2, 0.0003)) + "\n")
+    print "finished 17"
+
+    file.write('Output18: ' + str(printTable(backOffTrainingModel,0.001,firstInputWord)))
 
 def printTable(trainingBackOffWordSet, lamda , firstWord):
     outputLine = '\n'
@@ -69,7 +81,7 @@ def printTable(trainingBackOffWordSet, lamda , firstWord):
         outputLine += str(trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,word)) + '\t'
         outputLine += str(trainingBackOffWordSet.pBackOff(firstWord,word,lamda)) + '\n'
     # unseen-words
-    unseen = "unseen-word"
+    unseen = "UNSEEN_EVENT"
     outputLine += str(trainingBackOffWordSet.unigramWordSet.vocabularySize - trainingBackOffWordSet.unigramWordSet.distinctLength) + '\t'
     outputLine += unseen + '\t'
     outputLine += str(trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,unseen)) + '\t'
