@@ -1,6 +1,7 @@
 import sys
 
 import math
+import time
 
 from WordSet import WordSet
 from BigramWordSet import BigramWordSet
@@ -50,6 +51,22 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     print backOffTrainingModel.debug()
 
     file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)) + "\n")
+
+def printTable(trainingBackOffWordSet, lamda , firstWord):
+    outputLine = '\n'
+    for index,word in enumerate(set(trainingBackOffWordSet.unigramWordSet.wordAppearanceCounter)):
+        outputLine += str(index) + '\t' + word + '\t'
+        outputLine += str(trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,word)) + '\t'
+        outputLine += str(trainingBackOffWordSet.pBackOff(firstWord,word,lamda)) + '\n'
+    # unseen-words
+    unseen = "unseen-word"
+    outputLine += str(trainingBackOffWordSet.unigramWordSet.vocabularySize - trainingBackOffWordSet.unigramWordSet.distinctLength) + '\t'
+    outputLine += unseen + '\t'
+    outputLine += str(trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,unseen)) + '\t'
+    outputLine += str(trainingBackOffWordSet.pBackOff(firstWord,unseen,lamda)) + '\n'
+
+    return outputLine
+
 
 def frange(x, y, jump):
     while x < y:
@@ -123,4 +140,6 @@ def main():
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     main()
+    print "--- %s seconds ---" % (time.time() - start_time)
