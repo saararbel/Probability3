@@ -48,7 +48,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     # print backOffTrainingModel.pBackOff(firstInputWord, secondInputWord,0.001)
     print str(backOffTrainingModel.bigramWordSet.pLidstone(("bank", "economist"), 0.001)) + " boaz"
     # print backOffTrainingModel.pBackOff("bank", "economist",0.1)
-    print backOffTrainingModel.debug()
+    print "Debug %f" % backOffTrainingModel.debug()
 
     file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)) + "\n")
 
