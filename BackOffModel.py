@@ -7,8 +7,6 @@ class BackOffModel:
         self.alphaDict = {}
         self.unigramLidsone = {}
         self.unigramLamda = unigramLamda
-        # self.beta = 1 - sum([self.unigramWordSet.pLidstone(tempWord, 0.1) for tempWord in self.unigramWordSet.keys()])
-        # self.betaDict = {}
 
     # order : ... firstWord secondWord ....
     def pBackOff(self, firstWord, secondWord = None, bigramLamda = None):
@@ -17,19 +15,15 @@ class BackOffModel:
             firstWord, secondWord = firstWord
         if(self.bigramWordSet.countAppearances(firstWord, secondWord) > 0):
             return self.bigramWordSet.pLidstone((firstWord, secondWord), bigramLamda)
-        # if(secondWord not in self.unigramLidsone or self.unigramLidsone[secondWord] is None):
-        #     self.unigramLidsone[secondWord] = self.unigramWordSet.pLidstone(secondWord, self.unigramLamda)
         return self.getUnigramLidstone(secondWord) * self.calcAlpha(firstWord, bigramLamda)
 
     def calcAlpha(self, word, bigramLamda):
         key = (word, bigramLamda)
         if(key not in self.alphaDict or self.alphaDict[key] is None):
             mechana , mona = 1.0 , 1.0
-            # mona = 1.0
-            for tempWord in self.unigramWordSet.keys():
-                if(self.bigramWordSet.countAppearances(word, tempWord) > 0):
+            if word in self.bigramWordSet.firstWordDictToSecondCounter and self.bigramWordSet.firstWordDictToSecondCounter[word] is not None:
+                for tempWord in self.bigramWordSet.firstWordDictToSecondCounter[word]:
                     mona -= self.bigramWordSet.pLidstone((word, tempWord), bigramLamda)
-                    # mechana -= self.unigramWordSet.pLidstone(tempWord, self.unigramLamda)
                     mechana -= self.getUnigramLidstone(tempWord)
             self.alphaDict[key] = mona / mechana
         return self.alphaDict[key]

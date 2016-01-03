@@ -47,7 +47,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
 
     # print backOffTrainingModel.pBackOff(firstInputWord, secondInputWord,0.001)
     print str(backOffTrainingModel.bigramWordSet.pLidstone(("bank", "economist"), 0.001)) + " boaz"
-    # print backOffTrainingModel.pBackOff("bank", "economist",0.1)
+    print backOffTrainingModel.pBackOff("bank", "economist",0.1)
     print "Debug %f" % backOffTrainingModel.debug()
 
     file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)) + "\n")
@@ -56,6 +56,11 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     print "finished 13"
     file.write('Output14: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.1)) + "\n")
     print "finished 14"
+    minperplexity, minlamda = minimumPerplexity(backOffTrainingModel, backOffValidationModel)
+    file.write('Output15: ' + str(minlamda) + "\n")
+    print "finished 15"
+    file.write('Output16: ' + str(minperplexity) + "\n")
+    print "finished 16"
 
 def printTable(trainingBackOffWordSet, lamda , firstWord):
     outputLine = '\n'
@@ -71,7 +76,6 @@ def printTable(trainingBackOffWordSet, lamda , firstWord):
     outputLine += str(trainingBackOffWordSet.pBackOff(firstWord,unseen,lamda)) + '\n'
 
     return outputLine
-
 
 def frange(x, y, jump):
     while x < y:
