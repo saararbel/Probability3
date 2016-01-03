@@ -51,6 +51,11 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     print "Debug %f" % backOffTrainingModel.debug()
 
     file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)) + "\n")
+    print "finished 12"
+    file.write('Output13: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.001)) + "\n")
+    print "finished 13"
+    file.write('Output14: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.1)) + "\n")
+    print "finished 14"
 
 def printTable(trainingBackOffWordSet, lamda , firstWord):
     outputLine = '\n'

@@ -5,6 +5,7 @@ class BackOffModel:
         self.bigramWordSet = bigramWordSet
         self.unigramWordSet = unigramWordSet
         self.alphaDict = {}
+        self.unigramLidsone = {}
         self.unigramLamda = unigramLamda
         # self.beta = 1 - sum([self.unigramWordSet.pLidstone(tempWord, 0.1) for tempWord in self.unigramWordSet.keys()])
         # self.betaDict = {}
@@ -16,16 +17,20 @@ class BackOffModel:
             firstWord, secondWord = firstWord
         if(self.bigramWordSet.countAppearances(firstWord, secondWord) > 0):
             return self.bigramWordSet.pLidstone((firstWord, secondWord), bigramLamda)
-        return self.unigramWordSet.pLidstone(secondWord, self.unigramLamda) * self.calcAlpha(firstWord, bigramLamda)
+        # if(secondWord not in self.unigramLidsone or self.unigramLidsone[secondWord] is None):
+        #     self.unigramLidsone[secondWord] = self.unigramWordSet.pLidstone(secondWord, self.unigramLamda)
+        return self.getUnigramLidstone(secondWord) * self.calcAlpha(firstWord, bigramLamda)
 
     def calcAlpha(self, word, bigramLamda):
         key = (word, bigramLamda)
         if(key not in self.alphaDict or self.alphaDict[key] is None):
             mechana , mona = 1.0 , 1.0
-            for tempWord, amount in self.unigramWordSet.distinctItems():
+            # mona = 1.0
+            for tempWord in self.unigramWordSet.keys():
                 if(self.bigramWordSet.countAppearances(word, tempWord) > 0):
                     mona -= self.bigramWordSet.pLidstone((word, tempWord), bigramLamda)
-                    mechana -= self.unigramWordSet.pLidstone(tempWord, self.unigramLamda)
+                    # mechana -= self.unigramWordSet.pLidstone(tempWord, self.unigramLamda)
+                    mechana -= self.getUnigramLidstone(tempWord)
             self.alphaDict[key] = mona / mechana
         return self.alphaDict[key]
 
@@ -35,3 +40,8 @@ class BackOffModel:
         res = (self.unigramWordSet.vocabularySize - self.unigramWordSet.distinctLength) * self.pBackOff(word,"unseen-word", lamda)
         prop = [self.pBackOff(word,tempWord,lamda) for tempWord, amount in self.unigramWordSet.distinctItems()]
         return res + sum(prop)
+
+    def getUnigramLidstone(self, word):
+        if(word not in self.unigramLidsone or self.unigramLidsone[word] is None):
+            self.unigramLidsone[word] = self.unigramWordSet.pLidstone(word, self.unigramLamda)
+        return self.unigramLidsone[word]
