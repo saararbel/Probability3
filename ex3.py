@@ -31,6 +31,8 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
 
     cuttingIndex = int(round(len(words) * 0.9))
     trainingSet, validationSet = words[:cuttingIndex], words[cuttingIndex:]
+    print trainingSet[cuttingIndex-1]
+    print validationSet[0]
     trainingWordSet, validationWordSet = WordSet(trainingSet, vocabularySize), WordSet(validationSet, vocabularySize)
     file.write("Output6: " + str(len(words)) + "\n")
     file.write("Output7: " + str(validationWordSet.length) + "\n")
@@ -52,27 +54,27 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
 
     file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)) + "\n")
     print "finished 12"
-    file.write('Output13: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.001)) + "\n")
-    print "finished 13"
-    file.write('Output14: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.1)) + "\n")
-    print "finished 14"
-    # minperplexity, minlamda = minimumPerplexity(backOffTrainingModel, backOffValidationModel)
-    # file.write('Output15: ' + str(minlamda) + "\n")
-    # print "finished 15"
-    # file.write('Output16: ' + str(minperplexity) + "\n")
-    # print "finished 16"
-
-    with open(testSetFilename, 'rb') as input_file2:
-        input_file_data2 = input_file2.read()
-    words2 = parse_file_data(input_file_data2)
-    trainingWordSet2 = WordSet(words2,vocabularySize)
-    trainingBigramWordSet2 = BigramWordSet(words2, vocabularySize, trainingWordSet2)
-    backOffTrainingModel2 = BackOffModel(trainingBigramWordSet2,trainingWordSet2)
-
-    file.write('Output17: ' + str(backOffPerplexity(backOffTrainingModel, backOffTrainingModel2, 0.0003)) + "\n")
-    print "finished 17"
-
-    file.write('Output18: ' + str(printTable(backOffTrainingModel,0.001,firstInputWord)))
+    # file.write('Output13: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.001)) + "\n")
+    # print "finished 13"
+    # file.write('Output14: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.1)) + "\n")
+    # print "finished 14"
+    # # minperplexity, minlamda = minimumPerplexity(backOffTrainingModel, backOffValidationModel)
+    # # file.write('Output15: ' + str(minlamda) + "\n")
+    # # print "finished 15"
+    # # file.write('Output16: ' + str(minperplexity) + "\n")
+    # # print "finished 16"
+    #
+    # with open(testSetFilename, 'rb') as input_file2:
+    #     input_file_data2 = input_file2.read()
+    # words2 = parse_file_data(input_file_data2)
+    # trainingWordSet2 = WordSet(words2,vocabularySize)
+    # trainingBigramWordSet2 = BigramWordSet(words2, vocabularySize, trainingWordSet2)
+    # backOffTrainingModel2 = BackOffModel(trainingBigramWordSet2,trainingWordSet2)
+    #
+    # file.write('Output17: ' + str(backOffPerplexity(backOffTrainingModel, backOffTrainingModel2, 0.0003)) + "\n")
+    # print "finished 17"
+    #
+    # file.write('Output18: ' + str(printTable(backOffTrainingModel,0.001,firstInputWord)))
 
 def printTable(trainingBackOffWordSet, lamda , firstWord):
     outputLine = '\n'
@@ -124,6 +126,7 @@ def backOffPerplexity(trainingBackOffWordSet, validationBackOffWordSet, lamda):
     '''
     logs = [math.log(trainingBackOffWordSet.pBackOff(firstWord, secondWord, lamda)) * appearances for (firstWord, secondWord), appearances in
             validationBackOffWordSet.bigramWordSet.distinctItems() if True]
+    print validationBackOffWordSet.unigramWordSet.start[0]
     logs.append(math.log(trainingBackOffWordSet.pBackOff("begin-article", validationBackOffWordSet.unigramWordSet.start[0], lamda)))
 
     return math.pow(math.e, -1 * sum(logs) / validationBackOffWordSet.unigramWordSet.length)

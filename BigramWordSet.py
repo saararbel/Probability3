@@ -4,6 +4,7 @@ from collections import Counter
 import time
 
 class BigramWordSet(WordSet):
+    # def __init__(self, words, vocabularySize, unigramWordSet, dummyWord='begin-article'):
     def __init__(self, words, vocabularySize, unigramWordSet):
         # super(BigramWordSet, self).__init__(zip([dummyWord] + words[:-1], words), vocabularySize)
         super(BigramWordSet, self).__init__(zip(words[:-1], words[1:]), vocabularySize)
