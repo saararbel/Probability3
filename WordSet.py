@@ -3,18 +3,20 @@ class WordSet(object):
     '''
     Describes a stream of words (as our events), allowing needed methods on them.
     '''
-    def __init__(self, words, vocabularySize):
+    def __init__(self, words, vocabularySize, n = 1):
         '''
         :param words: A list of words .
         :param vocabularySize: a natural number setting the threshold of our vocabulary size.
         :return: a {WordSet} item
         '''
-        self.words = words
         self.wordAppearanceCounter = Counter(words)
         self.length = len(words)
+        self.start = words[:n]
         self.distinctLength = len(self.wordAppearanceCounter.keys())
         self.vocabularySize = vocabularySize
 
+    def keys(self):
+        return self.wordAppearanceCounter.iterkeys()
 
     def distinctItems(self):
         '''

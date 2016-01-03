@@ -49,10 +49,7 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     # print backOffTrainingModel.pBackOff("bank", "economist",0.1)
     print backOffTrainingModel.debug()
 
-    print str("bulbul = ") + str(backOffTrainingModel.bigramWordSet.pLidstone(("bank,economist"),0.001, trainingWordSet))
-    # print trainingWordSet.wordAppearanceCounter["bank"]
-    # file.write(str(backOffTrainingModel.pBackOff("the" , 0.1)))
-
+    file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)) + "\n")
 
 def printTable(trainingBackOffWordSet, lamda , firstWord):
     outputLine = '\n'
@@ -68,6 +65,7 @@ def printTable(trainingBackOffWordSet, lamda , firstWord):
     outputLine += str(trainingBackOffWordSet.pBackOff(firstWord,unseen,lamda)) + '\n'
 
     return outputLine
+
 
 def frange(x, y, jump):
     while x < y:
