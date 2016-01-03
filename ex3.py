@@ -1,6 +1,7 @@
 import sys
 
 import math
+import time
 
 from WordSet import WordSet
 from BigramWordSet import BigramWordSet
@@ -45,11 +46,15 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     backOffValidationModel = BackOffModel(validationBigramWordSet, validationWordSet)
 
     # print backOffTrainingModel.pBackOff(firstInputWord, secondInputWord,0.001)
-    print str(backOffTrainingModel.bigramWordSet.pLidstone(("bank", "economist"), 0.001)) + " boaz"
-    # print backOffTrainingModel.pBackOff("bank", "economist",0.1)
-    print backOffTrainingModel.debug()
+    # print str(backOffTrainingModel.bigramWordSet.pLidstone(("bank", "economist"), 0.001)) + " boaz"
+    # print backOffTrainingModel.debug()
 
     file.write('Output12: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.0001)) + "\n")
+    print "finished 12"
+    file.write('Output13: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.001)) + "\n")
+    print "finished 13"
+    file.write('Output14: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.1)) + "\n")
+    print "finished 14"
 
 def printTable(trainingBackOffWordSet, lamda , firstWord):
     outputLine = '\n'
@@ -139,4 +144,6 @@ def main():
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     main()
+    print "--- %s seconds ---" % (time.time() - start_time)
