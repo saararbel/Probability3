@@ -45,7 +45,6 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     backOffTrainingModel = BackOffModel(trainingBigramWordSet,trainingWordSet)
     backOffValidationModel = BackOffModel(validationBigramWordSet, validationWordSet)
 
-    # print backOffTrainingModel.pBackOff(firstInputWord, secondInputWord,0.001)
     print str(backOffTrainingModel.bigramWordSet.pLidstone(("bank", "economist"), 0.001)) + " boaz"
     print backOffTrainingModel.pBackOff("bank", "economist",0.1)
     print "Debug %f" % backOffTrainingModel.debug()
@@ -56,11 +55,11 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
     print "finished 13"
     file.write('Output14: ' + str(backOffPerplexity(backOffTrainingModel, backOffValidationModel, 0.1)) + "\n")
     print "finished 14"
-    # minperplexity, minlamda = minimumPerplexity(backOffTrainingModel, backOffValidationModel)
-    # file.write('Output15: ' + str(minlamda) + "\n")
-    # print "finished 15"
-    # file.write('Output16: ' + str(minperplexity) + "\n")
-    # print "finished 16"
+    minperplexity, minlamda = minimumPerplexity(backOffTrainingModel, backOffValidationModel)
+    file.write('Output15: ' + str(minlamda) + "\n")
+    print "finished 15"
+    file.write('Output16: ' + str(minperplexity) + "\n")
+    print "finished 16"
 
     with open(testSetFilename, 'rb') as input_file2:
         input_file_data2 = input_file2.read()
@@ -74,56 +73,85 @@ def generateOutputFile(developmentSetFilename, testSetFilename, firstInputWord, 
 
     file.write('Output18: ' + str(printTable(backOffTrainingModel,0.001,firstInputWord)))
 
-def printTable(trainingBackOffWordSet, lamda , firstWord):
+
+def printTable(trainingBackOffModel, lamda, firstWord):
+    '''
+    Create a table filled with your model results.
+    :param trainingBackOffModel: BackOffModel. The Back Off Discount Model of the training set.
+    :param lamda: float. Rational number.
+    :param firstWord: an event. The event that we wish to bind before each of the events seen in the training set for the calculation.
+    :return: A String representation of the table.
+    '''
     outputLine = '\n'
     combinations = []
     unseen = "UNSEEN_EVENT"
-    for index,word in enumerate(set(trainingBackOffWordSet.unigramWordSet.wordAppearanceCounter)):
-        combinations.append((index, word, trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,word), trainingBackOffWordSet.pBackOff(firstWord,word,lamda)))
-    combinations.append((trainingBackOffWordSet.unigramWordSet.vocabularySize - trainingBackOffWordSet.unigramWordSet.distinctLength, unseen, trainingBackOffWordSet.bigramWordSet.countAppearances(firstWord,unseen), trainingBackOffWordSet.pBackOff(firstWord,unseen,lamda)))
-    for index, word, appearences, propability in sorted(combinations, key = lambda x: x[3], reverse = True):
+    # Add a computation line for each of the shown events in the training model.
+    for word in trainingBackOffModel.unigramWordSet.keys():
+        combinations.append((word, trainingBackOffModel.bigramWordSet.countAppearances(firstWord, word), trainingBackOffModel.pBackOff(firstWord, word, lamda)))
+    # Add the event of unseen word.
+    combinations.append((unseen, trainingBackOffModel.bigramWordSet.countAppearances(firstWord, unseen), trainingBackOffModel.pBackOff(firstWord, unseen, lamda)))
+    for index, (word, appearences, propability) in enumerate(sorted(combinations, key = lambda x: x[2], reverse = True)):
         outputLine += str(index) + "\t" + str(word) + "\t" + str(appearences) + "\t" + str(propability) + "\n"
 
     return outputLine
 
+
 def frange(x, y, jump):
+    '''
+    Simple range method needed to work with float.
+    :param x: float. Starting value.
+    :param y: float. Starting value.
+    :param jump: float. Starting value.
+    :return:
+    '''
     while x < y:
         yield x
         x += jump
 
-def minimumPerplexity(trainingWordSet, validationWordSet):
+
+def minimumPerplexity(trainingBackOffModel, validationBackOffModel):
     '''
-    Calculating the perplexity of each of the lambdas in (0, 2] with jumps of 0.01. Then return the minimum perplexity
-     from between the perplexity caculated and its matching lambda.
-    :param trainingWordSet: Instance of {WordSet}.
-    :param validationWordSet: Instance of {WordSet}.
+    Calculating the perplexity of each of the lambdas in (0, 0.02] with jumps of 0.0001. Then return the minimum perplexity
+     from between the perplexity calculated and its matching lambda.
+    :param trainingWordSet: Instance of {BackOffModel}.
+    :param validationWordSet: Instance of {BackOffModel}.
     :return: min-perplexity, min-lambda
     '''
+    # Start from 0.0001 since the range is (0, 0.02] which means without 0.
     lamdagen = frange(0.0001, 0.02, 0.0001)
+    # Calculate the first value for us to have in the equation.
     minlamda = lamdagen.next()
-    minperplexity = backOffPerplexity(trainingWordSet, validationWordSet, minlamda)
+    minperplexity = backOffPerplexity(trainingBackOffModel, validationBackOffModel, minlamda)
+    # The calculation of each lambda.
     for lamda in lamdagen:
-        currperplexity = backOffPerplexity(trainingWordSet, validationWordSet, lamda)
+        currperplexity = backOffPerplexity(trainingBackOffModel, validationBackOffModel, lamda)
         if currperplexity < minperplexity:
             minperplexity = currperplexity
             minlamda = lamda
 
     return minperplexity, minlamda
 
-def backOffPerplexity(trainingBackOffWordSet, validationBackOffWordSet, lamda):
-    '''
-    Iterate each distinct word in {testSet} and sum his Lidstone discount's propability with the given {lamda lambda}
-     multiplied by the times it appeared.
-    :param trainingBackOffWordSet: Instance of {WordSet}.
-    :param validationBackOffWordSet: Instance of {WordSet}.
-    :param lamda: A rational positive number.
-    :return:
-    '''
-    logs = [math.log(trainingBackOffWordSet.pBackOff(firstWord, secondWord, lamda)) * appearances for (firstWord, secondWord), appearances in
-            validationBackOffWordSet.bigramWordSet.distinctItems() if True]
-    logs.append(math.log(trainingBackOffWordSet.pBackOff("begin-article", validationBackOffWordSet.unigramWordSet.start[0], lamda)))
 
-    return math.pow(math.e, -1 * sum(logs) / validationBackOffWordSet.unigramWordSet.length)
+def backOffPerplexity(trainingBackOffModel, validationBackOffModel, lamda):
+    '''
+    Iterate each distinct word in {trainingBackOffWordSet} and sum the ln of his BackOff discount's probability with
+    the given {lamda lambda} multiplied by the times it appeared (code optimization), then return the exponentiation
+    of base e (due to the fact that we use ln) with the exponent of the previous calculation times -1 divided by the size of the set.
+    :param trainingBackOffModel: Instance of {BackOffModel}.
+    :param validationBackOffModel: Instance of {BackOffModel}.
+    :param lamda: A rational positive number. A lambda for the calculation.
+    :return: the perplexity.
+    '''
+    sum = 0.0
+    # Sum all lns (in python, the default base for log used here is e) of BackOff discount of each tuple of words in validation.
+    for (firstWord, secondWord), appearances in validationBackOffModel.bigramWordSet.distinctItems():
+        sum += math.log(trainingBackOffModel.pBackOff(firstWord, secondWord, lamda)) * appearances
+    # The first word has no tuple of (something, first word) so a different calculation is needed.
+    sum += math.log(trainingBackOffModel.pBackOff("begin-article", validationBackOffModel.unigramWordSet.start[0], lamda))
+
+    # Then we calculate the e^(-1 * total-ln-of-backoff / N)
+    return math.pow(math.e, -1 * sum / validationBackOffModel.unigramWordSet.length)
+
 
 def parse_file_data(file_data):
     '''
