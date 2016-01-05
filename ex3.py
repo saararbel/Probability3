@@ -89,9 +89,9 @@ def printTable(trainingBackOffModel, lamda, firstWord):
     for word in trainingBackOffModel.unigramWordSet.keys():
         combinations.append((word, trainingBackOffModel.bigramWordSet.countAppearances(firstWord, word), trainingBackOffModel.pBackOff(firstWord, word, lamda)))
     # Add the event of unseen word.
-    combinations.append((unseen, trainingBackOffModel.bigramWordSet.countAppearances(firstWord, unseen), trainingBackOffModel.pBackOff(firstWord, unseen, lamda)))
     for index, (word, appearences, propability) in enumerate(sorted(combinations, key = lambda x: x[2], reverse = True)):
         outputLine += str(index) + "\t" + str(word) + "\t" + str(appearences) + "\t" + str(propability) + "\n"
+    outputLine += str(trainingBackOffModel.unigramWordSet.vocabularySize - trainingBackOffModel.unigramWordSet.distinctLength) + " \t" + unseen + "\t" + str(trainingBackOffModel.bigramWordSet.countAppearances(firstWord, unseen)) + "\t" + str(trainingBackOffModel.pBackOff(firstWord, unseen, lamda))
 
     return outputLine
 
